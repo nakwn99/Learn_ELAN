@@ -1,12 +1,23 @@
-%This function creates a state vectorList: NumNode x 2^NumNode
+Octave で OK この関数の機能を説明してみる
+参考資料：　数理科学2019年6月号51ページ　「エネルギー地形解析」増田直紀先生による解説
+江崎先生による User's guide
+この関数は、pfunc_03_Accuracy から呼び出され、vectorList をノードの数だけ作る
+dec2bin は小数 d の 2 進数表現を文字ベクトルとして返します。nodeNum が 3 なら、tmp は (000, 001, ..., 110, 111) を
+転置した縦ベクトルになる（後ろに ' がついているので転置）　これを 8 行 3 列の行列と対応させる
+次に vectorList の容器となる行列を作る　要素は全部 0　行数は tmp と同じ　列数は tmp の要素の文字数と同じ　000, .. ,111 なら ３
+vectorList(tmp == '0') = -1;　とすると、tmp の要素の文字で 0 の部分の要素を -1 に変換する
+vectorList(tmp == '1') =  1;　とすると、tmp の要素の文字で 1 の部分の要素を  1 に変換する
+flipud は、要素の -1 と +1 を入れ替える　' で転置するので、出来上がった vectorList は　nodeNum = 3 なら
+  -1   1  -1   1  -1   1  -1   1
+  -1  -1   1   1  -1  -1   1   1
+  -1  -1  -1  -1   1   1   1   1
+になる
+
+%This function creates a state vectorList: NumNode x 2^NumNode1
 function vectorList = mfunc_VectorList(nodeNum)
-
 node = 2^nodeNum;
-
 tmp = dec2bin((0:node-1)');
-
 vectorList = zeros(node, nodeNum, 'double');
-
 vectorList(tmp == '0') = -1;
 vectorList(tmp == '1') = 1;
 vectorList = flipud(vectorList');
