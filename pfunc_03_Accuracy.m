@@ -13,8 +13,8 @@ mfunc_VectorList 関数を呼び出して、vectorList をまず作っている
 増田先生の解説では図2の (C) に相当する
 vectorList から一列取り出し sampleVec とする　これを実測値の列の数だけ横に並べた行列に変換している　そこから vectorList を 
 sum(abs(引き算)) している　これは「sampleVecMatrix と 二値化した実測値が完全に一致している」と 0 になり、一致しない部分が多いほど大きな値になる
-find は、非ゼロ要素のインデックスと値を見つける関数　size（リスト, 2）は列の数　 
-だから numSample は、 「sampleVecMatrix と 二値化した実測値が完全に一致している」回数になる
+find では、detector の値が == 0 になるインデックスを見つけている　size（リスト, 2）は列の数　 
+だから numSample は、 「取り出した sampleVec と二値化した実測値が完全に一致している」回数になる
 それを実測値の列の数で割ると「実測値から求めた、そのパターンの出現確率」P_emp(\sigma) になる
 エントロピーは、情報エントロピーの基本的な式　-p log(p) で計算している
 ここまでが、実測値からの計算　　　（つづく）
@@ -47,31 +47,24 @@ for iteVec = 1:numVec
     end
     
 end
-
 SN = sum(SN_temp);
 
-
+ここから、モデルのほうの確率 P_model(\sigma) を計算する　式 (5) には二つの項がある　まず最初の項（sigma_i 一次）
+について計算する
 
 %% Evaluate 1st-order model
 %
 % 1st-order model:
 % E(V) = -sum h_i sigma_i
 %  
-
 probActive = mean((1+binarizedData)/2, 2); % probability of sigma being +1
 probInactive = 1-probActive;
-
 activeMatrix = probActive * ones(1,numVec);
 inactiveMatrix = probInactive * ones(1,numVec);
-
 probMatrix_temp = (vectorList+1)/2 .* activeMatrix + (1-vectorList)/2 .* inactiveMatrix;
-
 probMatrix = prod(probMatrix_temp)';
 prob1 = probMatrix;
-
 S1 = - prob1' * log2(prob1);
-
-
 
 %% Evaluate 2nd-order model
 
