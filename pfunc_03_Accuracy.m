@@ -1,3 +1,15 @@
+この関数の機能を説明してみる
+資料：数理科学2019年6月号51ページ「エネルギー地形解析」増田直紀先生による解説　江崎先生による User's guide
+
+この関数は、引数である二値化データ（実測値からの）を用いて、それに対応する確率、エントロピーを計算する
+また pfunc_02 で計算したパラメータ h, J を用いて、モデルに対応する確率、エントロピー（-p log P）を計算する
+mfunc_VectorList 関数を呼び出して、vectorList をまず作っている
+この vectorList は
+
+
+
+実測データからの確率、エントロピーの計算を vectorList 一行ごとに繰り返している
+sampleVec を取り出し、行列に変換している　そこから
 % 2016/11/11 by T. Ezaki 
 % This function calculates accuracy indices:  
 % r = (S1-S2)/(S1-SN), rD=(D1-D2)/D1
@@ -5,26 +17,16 @@
 % probN: empirical prob dist (exact), 
 % prob1: independent MEM 
 % prob2; pairwise MEM
-
 function [probN, prob1, prob2, rD, r] = pfunc_03_Accuracy(h, J, binarizedData)
-
 [nodeNumber,dataLength] = size(binarizedData);
-
 %% Create VectorList: nodeNumber x 2^nodeNumber
-
 vectorList = mfunc_VectorList(nodeNumber);
-
-
 %% Calculate empirical probability and its entropy (corresponding to N-th order model)
-
 numVec = size(vectorList,2);
 probN = zeros(numVec,1);
-
-for iteVec = 1:numVec
-    
+for iteVec = 1:numVec   
     sampleVec = vectorList(:,iteVec); % choose (iteVec)-th state
     sampleVecMatrix = sampleVec * ones(1, dataLength); 
-    
     detector = sum(abs(sampleVecMatrix - binarizedData));
     numSample = size(find(detector == 0), 2);
     
