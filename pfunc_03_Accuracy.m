@@ -1,15 +1,23 @@
-この関数の機能を説明してみる
+Octave で確かめながらこの関数の機能を説明してみる
 資料：数理科学2019年6月号51ページ「エネルギー地形解析」増田直紀先生による解説　江崎先生による User's guide
 
 この関数は、引数である二値化データ（実測値からの）を用いて、それに対応する確率、エントロピーを計算する
 また pfunc_02 で計算したパラメータ h, J を用いて、モデルに対応する確率、エントロピー（-p log P）を計算する
 mfunc_VectorList 関数を呼び出して、vectorList をまず作っている
-この vectorList は
-
-
-
-実測データからの確率、エントロピーの計算を vectorList 一行ごとに繰り返している
-sampleVec を取り出し、行列に変換している　そこから
+この vectorList は　例えば nodeNum = 3 なら
+  -1   1  -1   1  -1   1  -1   1
+  -1  -1   1   1  -1  -1   1   1
+  -1  -1  -1  -1   1   1   1   1
+のような行列を作る　各列が　0, 1, 2, 3, 4, 5, 6, 7 に相当する　増田先生の解説では図2の (C) の活動パターンに相当する
+実測データからの確率、エントロピーの計算を vectorList 　一列　ごとに繰り返している（行ではない）
+増田先生の解説では図2の (C) に相当する
+vectorList から一列取り出し sampleVec とする　これを実測値の列の数だけ横に並べた行列に変換している　そこから vectorList を 
+sum(abs(引き算)) している　これは「sampleVecMatrix と 二値化した実測値が完全に一致している」と 0 になり、一致しない部分が多いほど大きな値になる
+find は、非ゼロ要素のインデックスと値を見つける関数　size（リスト, 2）は列の数　 
+だから numSample は、 「sampleVecMatrix と 二値化した実測値が完全に一致している」回数になる
+それを実測値の列の数で割ると「実測値から求めた、そのパターンの出現確率」P_emp(\sigma) になる
+エントロピーは、情報エントロピーの基本的な式　-p log(p) で計算している
+ここまでが、実測値からの計算　　　（つづく）
 % 2016/11/11 by T. Ezaki 
 % This function calculates accuracy indices:  
 % r = (S1-S2)/(S1-SN), rD=(D1-D2)/D1
@@ -28,8 +36,7 @@ for iteVec = 1:numVec
     sampleVec = vectorList(:,iteVec); % choose (iteVec)-th state
     sampleVecMatrix = sampleVec * ones(1, dataLength); 
     detector = sum(abs(sampleVecMatrix - binarizedData));
-    numSample = size(find(detector == 0), 2);
-    
+    numSample = size(find(detector == 0), 2);  
     probN(iteVec,1) = numSample/size(binarizedData,2); % obtained empirical prob distribution
     
     % calculate entropy
