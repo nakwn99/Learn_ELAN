@@ -51,12 +51,16 @@ SN = sum(SN_temp);
 
 ここから、モデルのほうの確率 P_model(\sigma) を計算する　式 (5) には二つの項がある　まず最初の項（sigma_i 一次）
 について計算する
+binarizedData に 1 を足して 2 で割ると、-1 は 0 に、1 は 1 になる　mean(~, 2) は行方向に平均値を計算　この場合は、それぞれの行に +1 が
+存在する確率（個数 / 列数）を計算することになる　probInactive は -1 の確率　各ノードごとにこれらの値が計算され、
+縦に並んだベクトルになる
+numVec は列の数　ones(1, numVec) を掛け算すると probActive (or Inactive) を横向きに numVec だけ繰り返し並べることになる
+probActive はノードの数と同じ数の要素を持つ縦ベクトルなので、binarizedData と同じサイズの行列ができる
 
-%% Evaluate 1st-order model
-%
+
+%% Evaluate 1st-order model%
 % 1st-order model:
-% E(V) = -sum h_i sigma_i
-%  
+% E(V) = -sum h_i sigma_i  
 probActive = mean((1+binarizedData)/2, 2); % probability of sigma being +1
 probInactive = 1-probActive;
 activeMatrix = probActive * ones(1,numVec);
