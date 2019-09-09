@@ -17,7 +17,7 @@ find では、detector の値が == 0 になるインデックスを見つけて
 だから numSample は、 「取り出した sampleVec と二値化した実測値が完全に一致している」回数になる
 それを実測値の列の数で割ると「実測値から求めた、そのパターンの出現確率」P_emp(\sigma) になる
 エントロピーは、情報エントロピーの基本的な式　-p log(p) で計算している
-ここまでが、実測値からの計算　　　（つづく）
+（つづく）
 % 2016/11/11 by T. Ezaki 
 % This function calculates accuracy indices:  
 % r = (S1-S2)/(S1-SN), rD=(D1-D2)/D1
@@ -29,6 +29,10 @@ function [probN, prob1, prob2, rD, r] = pfunc_03_Accuracy(h, J, binarizedData)
 [nodeNumber,dataLength] = size(binarizedData);
 %% Create VectorList: nodeNumber x 2^nodeNumber
 vectorList = mfunc_VectorList(nodeNumber);
+
+「N-th order model」に相当　＝　ノードが N 個あり、それらが全てお互いに相互作用している状態 ？
+実測値は、そういうとても複雑なシステムから生じている可能性もある　全てをカバーするために、ここでは全ての実測値を用いて計算する
+
 %% Calculate empirical probability and its entropy (corresponding to N-th order model)
 numVec = size(vectorList,2);
 probN = zeros(numVec,1);
@@ -49,14 +53,18 @@ for iteVec = 1:numVec
 end
 SN = sum(SN_temp);
 
-ここから、モデルのほうの確率 P_model(\sigma) を計算する　式 (5) には二つの項がある　まず最初の項（sigma_i 一次）
-について計算する
+ここでも実測値 binarizedData を用いて計算しているが、上の計算（実測値が示す全エネルギー）とは異なり
+最初の項（sigma_i 一次）だけのモデル（1st-order model）について計算する　上には independent MEM と書かれている
+相互作用は考慮しない　＝　各ノード単独のエネルギー　これが全エネルギーよりずっと小さければ、「相互作用が強い」
 binarizedData に 1 を足して 2 で割ると、-1 は 0 に、1 は 1 になる　mean(~, 2) は行方向に平均値を計算　この場合は、それぞれの行に +1 が
 存在する確率（個数 / 列数）を計算することになる　probInactive は -1 の確率　各ノードごとにこれらの値が計算され、
 縦に並んだベクトルになる
-numVec は列の数　ones(1, numVec) を掛け算すると probActive (or Inactive) を横向きに numVec だけ繰り返し並べることになる
+numVec は列の数　ones(1, numVec) を掛け算すると、縦ベクトルである probActive (or Inactive) を横向きに numVec だけ繰り返し並べることになる
 probActive はノードの数と同じ数の要素を持つ縦ベクトルなので、binarizedData と同じサイズの行列ができる
-
+(vectorList+1)/2 .* activeMatrix　では、vectorList で 1 だった部分に probActive の値が入る　
+(1-vectorList)/2 .* inactiveMatrix　では、残りの 0 だった部分に probInactive の値が入る
+prod(probMatrix_temp) は、各列の要素の積を求める　
+転置がついているので、数値が実測値の列の数だけ、縦に並んだベクトルが結果として得られる　それが prob1
 
 %% Evaluate 1st-order model%
 % 1st-order model:
@@ -70,12 +78,17 @@ probMatrix = prod(probMatrix_temp)';
 prob1 = probMatrix;
 S1 = - prob1' * log2(prob1);
 
+ここでは、モデルのほうの確率 P_model(\sigma) を計算している　式 (5) は二つの項（単独、相互作用）がある二次モデルを示している　
+mfunc_StateProb(h, J) を呼び出して、それを計算する　
 %% Evaluate 2nd-order model
 
 prob2 = mfunc_StateProb(h,J);
 S2 = - prob2' * log2(prob2);
 
 
+SN は実測値から計算した「すべての相互作用を考慮したエントロピー」
+S1 は実測値から計算した「相互作用を考慮しないエントロピー」
+S2 はモデル（式(5)）から計算したエントロピー
 
 %%accuracy index 
 r = (S1-S2)/(S1-SN);
