@@ -1,17 +1,18 @@
 %%% この関数の機能を説明してみる
 %%% 参考資料：　数理科学2019年6月号51ページ　「エネルギー地形解析」増田直紀先生による解説
-%%% 江崎先生による User's guidefunction probMEM = mfunc_stateProb(h,J)
+%%% 江崎先生による User's guide
 
-%%% この関数は、モデルのほうの確率 P_model(\sigma) を計算している　式 (5) は二つの項（単独、相互作用）がある二次モデルを示している　
-%%% パラメータ h, J は pfunc_02 で推定してあるものを使う
-%%% mfunc_VectorList で vectorList を作る　出来上がった vectorList は　nodeNum = 3 なら
+%%% この関数は、pfunc_02 で推定してあるパラメータ h, J を用いて、モデルのほうの確率 P_model(\sigma) を計算している　
+%%% h, J は実測データによって決まるので、ここで計算される値 probMEM （解説では式（４））も実測データを反映して決まる
+%%% mfunc_VectorList で 活動パターン (= vectorList) を作る　出来上がった活動パターン (= vectorList) は　nodeNum = 3 なら
 %%%   -1   1  -1   1  -1   1  -1   1
 %%%   -1  -1   1   1  -1  -1   1   1
 %%%   -1  -1  -1  -1   1   1   1   1
 %%% になる
 %%% Z は、式（4）の分母　分配関数と呼ばれる関数の計算になる　これで割り算することで確率になる
-%%% 
+%%% probMEM は解説の式（4）　この値を返す
 
+function probMEM = mfunc_stateProb(h,J)
 
 nodeNumber = size(h,1);
 vectorList = mfunc_VectorList(nodeNumber);
