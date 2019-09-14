@@ -1,4 +1,4 @@
-%%% この関数の機能を説明してみる
+%%% この関数は、pfunc_02 で推定してあるパラメータ h, J を用いて、モデルのほうの確率 P_model(\sigma) を計算している
 %%% 参考資料：　数理科学2019年6月号51ページ　「エネルギー地形解析」増田直紀先生による解説
 %%% 江崎先生による User's guide
 
@@ -21,7 +21,8 @@ numVec = size(vectorList,2);
 Z = sum(exp(-(-diag((0.5*J*vectorList)' * vectorList) - sum(((h * ones(1,numVec)) .* vectorList)', 2))),1);
 probMEM = exp(-(-diag((0.5*J*vectorList)' * vectorList) - sum(((h * ones(1,numVec)) .* vectorList)', 2))) ./ Z;
 
-%%% この関数の機能を説明してみる
+%% この関数は推定した h, J を用いモデルの確率 P_model(\sigma) を計算
+%%% この関数は、pfunc_02 で推定してあるパラメータ h, J を用いて、モデルのほうの確率 P_model(\sigma) を計算している
 %%% 参考資料：　数理科学2019年6月号51ページ　「エネルギー地形解析」増田直紀先生による解説
 %%% 江崎先生による User's guide
 
