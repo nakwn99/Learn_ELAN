@@ -6,13 +6,12 @@
 %%%   -1   1  -1   1  -1   1  -1   1
 %%%   -1  -1   1   1  -1  -1   1   1
 %%%   -1  -1  -1  -1   1   1   1   1
-%%% になる
+%%% になる  列の数は 2^3 = 8
 %% 解説にあるように、ある活動パターンに対して、それと一か所が変化（+1 -> -1 または -1 -> +1） したパターンを隣接パターンとする
 %% ノードの数が N なら、一か所が変化する場合の数は N 通りあるので一つの活動パターンに N 個の隣接パターンがある
-%% mfunc_VectorIndex では、
-
-%% それらをまとめたものを NeighborMatrix とする
-
+%% mfunc_VectorIndex では、隣接パターンを決定しやすくするための index として vectorIndex を作成している
+%% EnergyIndex は、普通に左から 1, 2, 3, ... と順番につけた index
+%% （つづく）
 function [LocalMinIndex, BasinGraph, AdjacentList] = mfunc_LocalMin(nodeNumber, E)
 % Find local minimum points
 % Get vector list
@@ -20,8 +19,13 @@ vectorList = mfunc_VectorList(nodeNumber);
 % Calculate vector index (See mfunc_VectorIndex())
 [vectorIndex EnergyIndex] = mfunc_VectorIndex(vectorList);
 
+%% ここでは、あるパターンと隣接するパターンのリストを作成している
+%% 解説にあるように、ある活動パターンに対して、それと一か所が変化（+1 -> -1 または -1 -> +1） したパターンを隣接パターンとする
+%% 隣接パターンは、ノードの数と同じ個数存在する
+%% vectorIndex-1 と 1, 2, 4, ...  それぞれ XOR を取ると、それらの値が隣接パターンの index になる
+%% それらの index は、EnergyIndex 左から順に数えた値になる
+%% （つづく）
 % Calculate local minimum points
-
 % Make nearest neighbor index matrix
 % Each data is one index different from original position
 NeighborMatrix = vectorIndex;
@@ -31,12 +35,35 @@ for i=1:nodeNumber
     NeighborMatrix = [NeighborMatrix, tmp];
     Loc = Loc * 2;  % 1 bit shift
 end
+%% N=3 なら
+%% NeighborMatrix =
+%%   1   2   3   5　　　パターン１と隣接するのはパターン２，３，５
+%%   5   6   7   1　　　パターン５と隣接するのはパターン６，1，1
+%%   3   4   1   7　　　パターン３と隣接するのはパターン4，1，7
+%%   7   8   5   3　　　パターン７と隣接するのはパターン8，5，3
+%%   2   1   4   6　　　パターン２と隣接するのはパターン1，4，6
+%%   6   5   8   2　　　パターン６と隣接するのはパターン5，8，2
+%%   4   3   2   8　　　パターン４と隣接するのはパターン3，2，8
+%%   8   7   6   4　　　パターン８と隣接するのはパターン7，6，4
 
+%% ここの処理で、Matrix をリストに変換？　値は変化しない(Octave では）
 % Calculate adjacent list for adjacency matrix
 AdjacentList = EnergyIndex(NeighborMatrix);
 
+%%　隣接パターンが保持するエネルギーを取り出す　エネルギー E は N = 3 なら 2^3 = 8 個の値を持つ 
 % Make energy list at each position including neighbors
 NeighborEnergy = E(AdjacentList);
+%%  E=[8,7,6,5,4,3,2,1] なら
+%% >> E(AdjacentList)
+%%   8   7   6   4　　　パターン１のエネルギーは８、隣接パターンのエネルギーは　７、６、４
+%%   4   3   2   8
+%%   6   5   8   2
+%%   2   1   4   6
+%%   7   8   5   3
+%%   3   4   1   7
+%%   5   6   7   1
+%%   1   2   3   5　　　パターン８のエネルギーは１、隣接パターンのエネルギーは　２、３、５　　だから８は極小　
+%% この場合パターン８だけが極小
 
 % Calculate minimum energy and its index
 [EnergyMin, tmp] = min(NeighborEnergy, [], 2);
@@ -99,4 +126,4 @@ title('Local Minima and Basin (3D)', 'FontSize', 16);
 %%% この関数の機能を解読してみる
 %%% 参考資料：　数理科学2019年6月号51ページ　「エネルギー地形解析」増田直紀先生による解説
 %%% 江崎先生による User's guide
-
+%% 解説では 54 ページに書かれている
