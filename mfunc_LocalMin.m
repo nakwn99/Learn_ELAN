@@ -1,9 +1,22 @@
+%%% この関数の機能を解読してみる
+%%% 参考資料：　数理科学2019年6月号51ページ　「エネルギー地形解析」増田直紀先生による解説
+%%% 江崎先生による User's guide
+%% 解説では 54 ページに書かれている
+%% mfunc_VectorList(nodeNumber)　で、活動パターンを作る　出来上がった活動パターン (= vectorList) は　nodeNum = 3 なら
+%%%   -1   1  -1   1  -1   1  -1   1
+%%%   -1  -1   1   1  -1  -1   1   1
+%%%   -1  -1  -1  -1   1   1   1   1
+%%% になる
+%% 解説にあるように、ある活動パターンに対して、それと一か所が変化（+1 -> -1 または -1 -> +1） したパターンを隣接パターンとする
+%% ノードの数が N なら、一か所が変化する場合の数は N 通りあるので一つの活動パターンに N 個の隣接パターンがある
+%% mfunc_VectorIndex では、
+
+%% それらをまとめたものを NeighborMatrix とする
+
 function [LocalMinIndex, BasinGraph, AdjacentList] = mfunc_LocalMin(nodeNumber, E)
 % Find local minimum points
-
 % Get vector list
 vectorList = mfunc_VectorList(nodeNumber);
-
 % Calculate vector index (See mfunc_VectorIndex())
 [vectorIndex EnergyIndex] = mfunc_VectorIndex(vectorList);
 
@@ -83,5 +96,7 @@ ax.XTickLabel = [];
 ax.YTickLabel = [];
 title('Local Minima and Basin (3D)', 'FontSize', 16);
 
-
+%%% この関数の機能を解読してみる
+%%% 参考資料：　数理科学2019年6月号51ページ　「エネルギー地形解析」増田直紀先生による解説
+%%% 江崎先生による User's guide
 
