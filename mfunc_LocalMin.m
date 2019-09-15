@@ -47,6 +47,7 @@ end
 %%   8   7   6   4　　　パターン８と隣接するのはパターン7，6，4
 
 %% ここの処理で、Matrix をリストに変換？　値は変化しない(Octave では）
+%% （つづく）
 % Calculate adjacent list for adjacency matrix
 AdjacentList = EnergyIndex(NeighborMatrix);
 
@@ -63,10 +64,22 @@ NeighborEnergy = E(AdjacentList);
 %%   3   4   1   7
 %%   5   6   7   1
 %%   1   2   3   5　　　パターン８のエネルギーは１、隣接パターンのエネルギーは　２、３、５　　だから８は極小　
-%% この場合パターン８だけが極小
-
+%% この場合パターン８だけが極小状態　（つづく）
+ 
+%% EnergyMin に最小の値、tmp にその値に対する index　上の例では tmp(8) = 1
+%% （つづく）
 % Calculate minimum energy and its index
 [EnergyMin, tmp] = min(NeighborEnergy, [], 2);
+
+%% Basingraph = 地形図　
+%% sub2ind([行数、列数], 行、列）は、その行列の要素を示す（行、列）を単一のインデックス数値に変換する
+%% 値の振り方は、左上が１で、行方向（下向き）に２，３、…　と数えていく　一番下の次は、その右の行の一番上
+%% sub2ind(size(AdjacentList), idx, tmp) で、AdjacentList 行列の、各行で一番エネルギーが低い要素を指し示す
+%% BasnGraph は、各行で一番エネルギーが低いパターンを示す vectorIndex の値 = そのパターンは、その行における極小　
+%% LocalMinIndex = idx(idx == BasinGraph);　これは、BasinGraph の要素の値が idx (例：1:8 の縦ベクトル）と一致する
+%% 行を選んでいる　一致している＝その行の最低値が隣接パターンではなく自分自身＝極小状態
+%% 極小である行（活動パターン）は複数存在してもよい
+%% （つづく）
 
 % If the direction of BasinGraph is the same as its own, it is local
 % minimum.
@@ -75,6 +88,9 @@ BasinGraph = AdjacentList(sub2ind(size(AdjacentList), idx, tmp));
 LocalMinIndex = idx(idx == BasinGraph);
 BasinGraph = [idx, BasinGraph];
 
+%% digraph オブジェクトは、方向性をもつエッジによりノードが連結されている有向グラフを表します
+%% warning: the 'digraph' function is not yet implemented in Octave
+%% （つづく）
 % Calculate digraph
 G = digraph(BasinGraph(:,1), BasinGraph(:,2));
 
@@ -123,7 +139,7 @@ ax.XTickLabel = [];
 ax.YTickLabel = [];
 title('Local Minima and Basin (3D)', 'FontSize', 16);
 
-%%% この関数の機能を解読してみる
+%%% この関数は活動パターンのエネルギーを計算し極小値を取っているパターンを見つける
 %%% 参考資料：　数理科学2019年6月号51ページ　「エネルギー地形解析」増田直紀先生による解説
 %%% 江崎先生による User's guide
 %% 解説では 54 ページに書かれている
