@@ -22,8 +22,7 @@ vectorList = mfunc_VectorList(nodeNumber);
 %% ここでは、あるパターンと隣接するパターンのリストを作成している
 %% 解説にあるように、ある活動パターンに対して、それと一か所が変化（+1 -> -1 または -1 -> +1） したパターンを隣接パターンとする
 %% 隣接パターンは、ノードの数と同じ個数存在する
-%% vectorIndex-1 と 1, 2, 4, ...  それぞれ XOR を取ると、それらの値が隣接パターンの index になる
-%% それらの index は、EnergyIndex 左から順に数えた値になる
+%% (vectorIndex-1) と 1, 2, 4, ...  それぞれ XOR を取ると、それらの値が隣接パターンの index になるように巧妙に工夫されている
 %% （つづく）
 % Calculate local minimum points
 % Make nearest neighbor index matrix
@@ -37,21 +36,21 @@ for i=1:nodeNumber
 end
 %% N=3 なら
 %% NeighborMatrix =
-%%   1   2   3   5　　　パターン１と隣接するのはパターン２，３，５
-%%   5   6   7   1　　　パターン５と隣接するのはパターン６，1，1
-%%   3   4   1   7　　　パターン３と隣接するのはパターン4，1，7
-%%   7   8   5   3　　　パターン７と隣接するのはパターン8，5，3
-%%   2   1   4   6　　　パターン２と隣接するのはパターン1，4，6
-%%   6   5   8   2　　　パターン６と隣接するのはパターン5，8，2
-%%   4   3   2   8　　　パターン４と隣接するのはパターン3，2，8
-%%   8   7   6   4　　　パターン８と隣接するのはパターン7，6，4
+%%   1   2   3   5　　　パターン１（vectorIndex が１）と隣接するのはパターン２，３，５（こちらの数字も vectorIndex の２，３，５）
+%%   5   6   7   1　　　パターン５（vectorIndex が）と隣接するのはパターン６，７，1
+%%   3   4   1   7　　　パターン３（vectorIndex が）と隣接するのはパターン4，1，7
+%%   7   8   5   3　　　パターン７（vectorIndex が）と隣接するのはパターン8，5，3
+%%   2   1   4   6　　　パターン２（vectorIndex が）と隣接するのはパターン1，4，6
+%%   6   5   8   2　　　パターン６（vectorIndex が）と隣接するのはパターン5，8，2
+%%   4   3   2   8　　　パターン４（vectorIndex が）と隣接するのはパターン3，2，8
+%%   8   7   6   4　　　パターン８（vectorIndex が）と隣接するのはパターン7，6，4
 
-%% ここの処理で、Matrix をリストに変換？　値は変化しない(Octave では）
+%% ここの処理で、Matrix をリストに変換？　値は変化しない EnergyIndex はふつうに (1,2,3,4,5,6,7,8) と並べている
 %% （つづく）
 % Calculate adjacent list for adjacency matrix
 AdjacentList = EnergyIndex(NeighborMatrix);
 
-%%　隣接パターンが保持するエネルギーを取り出す　エネルギー E は N = 3 なら 2^3 = 8 個の値を持つ 
+%%　隣接パターンが保持するエネルギーを取り出す　エネルギー E は N = 3 なら 2^3 = 8 個のパターンがそれぞれエネルギー値を持つ 
 % Make energy list at each position including neighbors
 NeighborEnergy = E(AdjacentList);
 %%  E=[8,7,6,5,4,3,2,1] なら
