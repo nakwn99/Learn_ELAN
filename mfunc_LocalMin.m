@@ -89,6 +89,8 @@ BasinGraph = [idx, BasinGraph];
 
 %% digraph オブジェクトは、方向性をもつエッジによりノードが連結されている有向グラフを表します
 %% warning: the 'digraph' function is not yet implemented in Octave
+%%
+%% Octave で動かすには、修正が必要
 %% （つづく）
 % Calculate digraph
 G = digraph(BasinGraph(:,1), BasinGraph(:,2));
